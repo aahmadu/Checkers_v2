@@ -23,26 +23,30 @@ class Player:
         if pos[0]+distance < 8 and pos[1]+distance < 8 and direction=="BR":
             return [pos[0]+distance, pos[1]+distance]
 
-    def check_capture(self, pos, board, possibles=None):
+    def check_capture(self, pos, board, possibles=None, captured=None):
         if not possibles:
             possibles=[]
+        if not captured:
+            captured=[]
         # print(pos, " --start-- ", possibles)
         if tl:= self.get_diagonal(pos, "TL", 1, board):
             if board[tl[0]][tl[1]] in self.oponent_no:
                 # print(pos)
-                if tl:= self.get_diagonal(pos, "TL", 2, board):
-                    if board[tl[0]][tl[1]] == 0:
-                        possibles.append(tl)
+                if tl2:= self.get_diagonal(pos, "TL", 2, board):
+                    if board[tl2[0]][tl2[1]] == 0:
+                        possibles.append(tl2)
+                        captured.append(tl)
                         # print("tl", tl, pos)
-                        self.check_capture(tl, board, possibles)
+                        self.check_capture(tl, board, possibles, captured)
         if tr:= self.get_diagonal(pos, "TR", 1, board):
             if board[tr[0]][tr[1]] in self.oponent_no:
-                if tr:= self.get_diagonal(pos, "TR", 2, board):
-                    if board[tr[0]][tr[1]] == 0:
-                        possibles.append(tr)
-                        self.check_capture(tr, board, possibles)
+                if tr2:= self.get_diagonal(pos, "TR", 2, board):
+                    if board[tr2[0]][tr2[1]] == 0:
+                        possibles.append(tr2)
+                        captured.append(tr)
+                        self.check_capture(tr, board, possibles, captured)
         # print(pos, " --end-- ", possibles)
-        return possibles
+        return possibles, captured
     def check_piece_moves(self, pos, board):
         possibles = []
 
@@ -57,8 +61,9 @@ class Player:
 
         #check captures
         # print(pos, possibles, self.check_capture(pos, board))
-        possibles += self.check_capture(pos, board)
-
+        new_positions, captures = self.check_capture(pos, board)
+        possibles += new_positions
+        # print("captures", captures)
         return possibles
 
 
@@ -71,6 +76,8 @@ class Player:
                         # print((i,j),current_moves)
                         possible_moves[(i,j)]=current_moves
         return possible_moves
+
+    def make_move(self, )
 
 
 class Game:
