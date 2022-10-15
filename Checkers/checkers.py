@@ -108,6 +108,7 @@ class Player:
             if board[tr[0]][tr[1]] == 0:
                 piece_routes.add_move(tr)
 
+        # potentially going back and forth problem
         if piece_routes.isKing:
             if bl:= self.get_diagonal(piece_routes.origin, "BL", 1, board):
                 if board[bl[0]][bl[1]] == 0:
@@ -147,7 +148,7 @@ class Game:
 
     def __init__(self):
         self.board = [[0,0,0,2,0,2,0,2],
-                      [1,0,2,0,2,0,0,0],
+                      [1,0,11,0,2,0,0,0],
                       [0,2,0,2,0,2,0,2],
                       [0,0,0,0,0,0,0,0],
                       [0,0,0,0,0,0,0,0],
@@ -209,52 +210,3 @@ class Game:
             self.current_turn = 2
         else:
             self.current_turn = 1
-
-test = Game()
-
-while True:
-    test.print_board()
-    print("It's "+str(test.current_turn)+"'s turn to play")
-    allpm = test.get_possible_moves()
-    options = []
-    has_capture = False
-    for i in allpm:
-        if i.hasCapture:
-            options.append(i)
-            has_capture = True
-    if not has_capture:
-        options = allpm
-    [print(x.origin) for x in options]
-    move_from = None
-    valid_input = False
-    while not valid_input:
-        input_from = input("Select piece to move (e.g. 2,3):")
-        if re.match("[0-7],[0-7]", input_from):
-            move_from = eval(input_from)
-            for i in options:
-                if i.origin == move_from:
-                    valid_input=True
-                    options = i
-                    break
-            else:
-                print("Invalid option, try again")
-        else:
-            print("Invalid option, try again")
-    [print(x) for x in options.routes]
-    captures =[]
-    move_to = None
-    valid_input = False
-    while not valid_input:
-        input_to = input("Select where to move to (e.g. 2,3):")
-        if re.match("[0-7],[0-7]", input_to):
-            move_to = eval(input_to)
-            for i in range(len(options.routes)):
-                if move_to == options.routes[i][-1]:
-                    valid_input=True
-                    captures = options.captures[i]
-                    break
-            else:
-                print("Invalid option, try again")
-        else:
-            print("Invalid option, try again")
-    test.make_move(move_from, move_to, captures)
