@@ -99,7 +99,6 @@ class Player:
 
 
     def get_possible_moves(self, board):
-        print(board)
         possible_moves = []
         for i in range(len(board)):
             for j in range(len(board)):
@@ -125,7 +124,7 @@ class Game:
                       [2,0,2,0,2,0,0,0],
                       [0,2,0,2,0,2,0,2],
                       [0,0,0,0,0,0,0,0],
-                      [0,2,0,2,0,0,0,0],
+                      [0,0,0,0,0,0,0,0],
                       [0,0,1,0,1,0,1,0],
                       [0,1,0,1,0,1,0,1],
                       [1,0,1,0,1,0,1,0]]
@@ -153,6 +152,9 @@ class Game:
         reversed = [x[::-1] for x in reversed]
         return reversed
 
+    def rotate_input(self, pos_in):
+        return (7-pos_in[0], 7-pos_in[1])
+
     def get_possible_moves(self):
         if self.current_turn == 1:
             return self.player1.get_possible_moves(self.board)
@@ -160,10 +162,16 @@ class Game:
             return self.player2.get_possible_moves(self.rotate_board())
 
     def make_move(self, move_from, move_to, captures):
+        # if self.current_turn == 2:
+        #     move_from = self.rotate_input(move_from)
+        #     move_to = self.rotate_input(move_to)
+        #     captures = [self.rotate_input(x) for x in captures]
         self.board[move_to[0]][move_to[1]] = self.board[move_from[0]][move_from[1]]
         self.board[move_from[0]][move_from[1]] = 0
-        for piece in captures:
-            self.board[piece[0]][piece[1]] = 0
+        print(captures)
+        if captures[0] != ((),):
+            for piece in captures:
+                self.board[piece[0]][piece[1]] = 0
 
         if self.current_turn == 1:
             self.current_turn = 2
@@ -176,7 +184,6 @@ while True:
     test.print_board()
     print("It's "+str(test.current_turn)+"'s turn to play")
     allpm = test.get_possible_moves()
-    [print(x.origin) for x in allpm]
     options = []
     has_capture = False
     for i in allpm:
@@ -185,7 +192,7 @@ while True:
             has_capture = True
     if not has_capture:
         options = allpm
-
+    [print(x.origin) for x in options]
     move_from = None
     valid_input = False
     while not valid_input:
@@ -201,16 +208,21 @@ while True:
                 print("Invalid option, try again")
         else:
             print("Invalid option, try again")
+    [print(x) for x in options.routes]
+    captures =[]
     move_to = None
     valid_input = False
     while not valid_input:
         input_to = input("Select where to move to (e.g. 2,3):")
         if re.match("[0-7],[0-7]", input_to):
             move_to = eval(input_to)
-            if move_to in [x[-1] for x in options.routes]:
-                valid_input=True
+            for i in range(len(options.routes)):
+                if move_to == options.routes[i][-1]:
+                    valid_input=True
+                    captures = options.captures[i]
+                    break
             else:
                 print("Invalid option, try again")
         else:
             print("Invalid option, try again")
-    test.make_move(move_from, move_to, [])
+    test.make_move(move_from, move_to, captures)
