@@ -146,8 +146,8 @@ class Game:
     """docstring for Game."""
 
     def __init__(self):
-        self.board = [[0,2,0,2,0,2,0,2],
-                      [2,0,2,0,2,0,0,0],
+        self.board = [[0,0,0,2,0,2,0,2],
+                      [1,0,2,0,2,0,0,0],
                       [0,2,0,2,0,2,0,2],
                       [0,0,0,0,0,0,0,0],
                       [0,0,0,0,0,0,0,0],
@@ -198,6 +198,12 @@ class Game:
         if captures[0] != ((),):
             for piece in captures:
                 self.board[piece[0]][piece[1]] = 0
+
+        if self.board[move_to[0]][move_to[1]] < 10:
+            if self.current_turn ==1 and move_to[0]==0:
+                self.board[move_to[0]][move_to[1]] = 11
+            if self.current_turn ==2 and move_to[0]==7:
+                self.board[move_to[0]][move_to[1]] = 22
 
         if self.current_turn == 1:
             self.current_turn = 2
