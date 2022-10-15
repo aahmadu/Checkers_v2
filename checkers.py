@@ -3,10 +3,11 @@ import re
 class PossibleMove:
     """docstring for PossibleMove."""
 
-    def __init__(self, origin):
+    def __init__(self, origin, isKing=False):
         self.origin = origin
         self.isEmpty = True
         self.hasCapture = False
+        self.isKing = isKing
         self.routes = []
         self.captures = []
 
@@ -82,6 +83,20 @@ class Player:
                         piece_routes.add_move(tr2,pos,tr)
                         self.check_capture(piece_routes, tr2, board)
 
+        if piece_routes.isKing:
+            if bl:= self.get_diagonal(pos, "BL", 1, board):
+                if board[bl[0]][bl[1]] in self.oponent_no:
+                    if bl2:= self.get_diagonal(pos, "BL", 2, board):
+                        if board[bl2[0]][bl2[1]] == 0:
+                            piece_routes.add_move(bl2,pos,bl)
+                            self.check_capture(piece_routes, bl2, board)
+
+            if br:= self.get_diagonal(pos, "BR", 1, board):
+                if board[br[0]][br[1]] in self.oponent_no:
+                    if br2:= self.get_diagonal(pos, "BR", 2, board):
+                        if board[br2[0]][br2[1]] == 0:
+                            piece_routes.add_move(br2,pos,br)
+                            self.check_capture(piece_routes, br2, board)
 
         return piece_routes
     def check_piece_moves(self, piece_routes, board):
@@ -93,6 +108,14 @@ class Player:
             if board[tr[0]][tr[1]] == 0:
                 piece_routes.add_move(tr)
 
+        if piece_routes.isKing:
+            if bl:= self.get_diagonal(piece_routes.origin, "BL", 1, board):
+                if board[bl[0]][bl[1]] == 0:
+                    piece_routes.add_move(bl)
+            if br:= self.get_diagonal(piece_routes.origin, "BR", 1, board):
+                if board[br[0]][br[1]] == 0:
+                    piece_routes.add_move(br)
+
         #check captures
         piece_routes = self.check_capture(piece_routes, piece_routes.origin, board)
         return piece_routes
@@ -103,7 +126,10 @@ class Player:
         for i in range(len(board)):
             for j in range(len(board)):
                 if board[i][j] in self.player_no:
-                    piece_routes = PossibleMove((i,j))
+                    isKing = False
+                    if board[i][j] > 10:
+                        isKing=True
+                    piece_routes = PossibleMove((i,j),isKing)
                     piece_routes = self.check_piece_moves(piece_routes, board)
                     if not piece_routes.isEmpty:
                         if self.rotate_results:
@@ -139,8 +165,12 @@ class Game:
             board_row = str(i)+"|"
             for j in range(len(self.board)):
                 if self.board[i][j] == 1:
-                    board_row += "B"
+                    board_row += "b"
                 elif self.board[i][j] == 2:
+                    board_row += "w"
+                elif self.board[i][j] == 11:
+                    board_row += "B"
+                elif self.board[i][j] == 22:
                     board_row += "W"
                 else:
                     board_row += " "
@@ -162,10 +192,6 @@ class Game:
             return self.player2.get_possible_moves(self.rotate_board())
 
     def make_move(self, move_from, move_to, captures):
-        # if self.current_turn == 2:
-        #     move_from = self.rotate_input(move_from)
-        #     move_to = self.rotate_input(move_to)
-        #     captures = [self.rotate_input(x) for x in captures]
         self.board[move_to[0]][move_to[1]] = self.board[move_from[0]][move_from[1]]
         self.board[move_from[0]][move_from[1]] = 0
         print(captures)
