@@ -145,8 +145,8 @@ class Player:
         return possible_moves
 
 
-class Game:
-    """docstring for Game."""
+class Checkers:
+    """docstring for Checkers."""
 
     def __init__(self):
         self.board = [[0,11,0,0,0,0,0,0],

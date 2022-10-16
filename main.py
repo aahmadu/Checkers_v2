@@ -1,7 +1,7 @@
-from Checkers import *
+from checkers.checkers import *
 
 if __name__ == "__main__":
-    checkers_game = Game()
+    checkers_game = Checkers()
 
     while True:
         checkers_game.print_board()
