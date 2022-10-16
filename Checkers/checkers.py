@@ -74,6 +74,7 @@ class Player:
                 if tl2:= self.get_diagonal(pos, "TL", 2, board):
                     if board[tl2[0]][tl2[1]] == 0:
                         piece_routes.add_move(tl2,pos,tl)
+                        board[tl[0]][tl[1]] = 0
                         self.check_capture(piece_routes, tl2, board)
 
         if tr:= self.get_diagonal(pos, "TR", 1, board):
@@ -81,14 +82,16 @@ class Player:
                 if tr2:= self.get_diagonal(pos, "TR", 2, board):
                     if board[tr2[0]][tr2[1]] == 0:
                         piece_routes.add_move(tr2,pos,tr)
+                        board[tr[0]][tr[1]] = 0
                         self.check_capture(piece_routes, tr2, board)
-
+        # potentially going back and forth problem
         if piece_routes.isKing:
             if bl:= self.get_diagonal(pos, "BL", 1, board):
                 if board[bl[0]][bl[1]] in self.oponent_no:
                     if bl2:= self.get_diagonal(pos, "BL", 2, board):
                         if board[bl2[0]][bl2[1]] == 0:
                             piece_routes.add_move(bl2,pos,bl)
+                            board[bl[0]][bl[1]] = 0
                             self.check_capture(piece_routes, bl2, board)
 
             if br:= self.get_diagonal(pos, "BR", 1, board):
@@ -96,6 +99,7 @@ class Player:
                     if br2:= self.get_diagonal(pos, "BR", 2, board):
                         if board[br2[0]][br2[1]] == 0:
                             piece_routes.add_move(br2,pos,br)
+                            board[br[0]][br[1]] = 0
                             self.check_capture(piece_routes, br2, board)
 
         return piece_routes
@@ -108,7 +112,6 @@ class Player:
             if board[tr[0]][tr[1]] == 0:
                 piece_routes.add_move(tr)
 
-        # potentially going back and forth problem
         if piece_routes.isKing:
             if bl:= self.get_diagonal(piece_routes.origin, "BL", 1, board):
                 if board[bl[0]][bl[1]] == 0:
@@ -127,19 +130,18 @@ class Player:
         for i in range(len(board)):
             for j in range(len(board)):
                 if board[i][j] in self.player_no:
+                    newboard = [x[:] for x in board]
                     isKing = False
                     if board[i][j] > 10:
                         isKing=True
                     piece_routes = PossibleMove((i,j),isKing)
-                    piece_routes = self.check_piece_moves(piece_routes, board)
+                    piece_routes = self.check_piece_moves(piece_routes, newboard)
                     if not piece_routes.isEmpty:
                         if self.rotate_results:
-
                             piece_routes = self._rotate(piece_routes)
                             possible_moves.append(piece_routes)
                         else:
                             possible_moves.append(piece_routes)
-
         return possible_moves
 
 
@@ -147,9 +149,9 @@ class Game:
     """docstring for Game."""
 
     def __init__(self):
-        self.board = [[0,0,0,2,0,2,0,2],
-                      [1,0,11,0,2,0,0,0],
-                      [0,2,0,2,0,2,0,2],
+        self.board = [[0,11,0,0,0,0,0,0],
+                      [0,0,2,0,0,0,0,0],
+                      [0,1,0,0,0,0,0,0],
                       [0,0,0,0,0,0,0,0],
                       [0,0,0,0,0,0,0,0],
                       [0,0,1,0,1,0,1,0],
@@ -205,6 +207,21 @@ class Game:
                 self.board[move_to[0]][move_to[1]] = 11
             if self.current_turn ==2 and move_to[0]==7:
                 self.board[move_to[0]][move_to[1]] = 22
+
+        piece_count_1=0
+        piece_count_2=0
+        for i in range(len(self.board)):
+            for j in range(len(self.board)):
+                if self.board[i][j] in [1,11]:
+                    piece_count_1+=1
+                elif self.board[i][j] in [2,22]:
+                    piece_count_2+=1
+        if piece_count_1 == 0:
+            print("2 wins")
+            return 1
+        if piece_count_2 == 0:
+            print("1 wins")
+            return 1
 
         if self.current_turn == 1:
             self.current_turn = 2

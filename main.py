@@ -48,4 +48,5 @@ if __name__ == "__main__":
                     print("Invalid option, try again")
             else:
                 print("Invalid option, try again")
-        checkers_game.make_move(move_from, move_to, captures)
+        if checkers_game.make_move(move_from, move_to, captures):
+            break
