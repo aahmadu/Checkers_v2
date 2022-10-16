@@ -150,8 +150,8 @@ class Game:
 
     def __init__(self):
         self.board = [[0,11,0,0,0,0,0,0],
-                      [0,0,2,0,0,0,0,0],
-                      [0,1,0,0,0,0,0,0],
+                      [0,0,0,0,0,2,0,0],
+                      [0,1,0,0,2,0,2,0],
                       [0,0,0,0,0,0,0,0],
                       [0,0,0,0,0,0,0,0],
                       [0,0,1,0,1,0,1,0],
@@ -160,6 +160,8 @@ class Game:
         self.current_turn = 1
         self.player1 = Player(1)
         self.player2 = Player(2)
+
+        self.moves_without_capture = 0 #40 without causess draw
 
 
     def print_board(self):
@@ -198,16 +200,38 @@ class Game:
         self.board[move_to[0]][move_to[1]] = self.board[move_from[0]][move_from[1]]
         self.board[move_from[0]][move_from[1]] = 0
         print(captures)
+        isCaptureMove = True
+        if captures == [((),)]:
+            isCaptureMove = False
+
         if captures[0] != ((),):
             for piece in captures:
                 self.board[piece[0]][piece[1]] = 0
 
         if self.board[move_to[0]][move_to[1]] < 10:
-            if self.current_turn ==1 and move_to[0]==0:
+            if self.current_turn == 1 and move_to[0]==0:
                 self.board[move_to[0]][move_to[1]] = 11
-            if self.current_turn ==2 and move_to[0]==7:
+            if self.current_turn == 2 and move_to[0]==7:
                 self.board[move_to[0]][move_to[1]] = 22
 
+
+
+        if self.current_turn == 1:
+            self.current_turn = 2
+        else:
+            self.current_turn = 1
+
+        return self.check_status(isCaptureMove)
+
+    def check_status(self, isCapture):
+        if not isCapture:
+            self.moves_without_capture += 1
+        else:
+            self.moves_without_capture = 0
+        if self.moves_without_capture == 40:
+            print("Draw")
+            return 1
+        print(self.moves_without_capture, isCapture)
         piece_count_1=0
         piece_count_2=0
         for i in range(len(self.board)):
@@ -222,8 +246,3 @@ class Game:
         if piece_count_2 == 0:
             print("1 wins")
             return 1
-
-        if self.current_turn == 1:
-            self.current_turn = 2
-        else:
-            self.current_turn = 1
