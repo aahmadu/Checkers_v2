@@ -1,5 +1,6 @@
 from checkers.checkers import *
 
+
 if __name__ == "__main__":
     checkers_game = Checkers()
 
